@@ -3,21 +3,15 @@
  */
 package com.renanrramos.embeddedkeycloak.config;
 
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.services.managers.ApplianceBootstrap;
-import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
 import org.keycloak.services.util.JsonConfigProviderFactory;
-import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties;
 import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties.AdminUser;
@@ -40,7 +34,6 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	public EmbeddedKeycloakApp() {
 		super();
 		createMasterRealmAdminUser();
-		createRealm();
 	}
 	
 	private void createMasterRealmAdminUser() {
@@ -54,21 +47,6 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 			session.getTransactionManager().commit();			
 		} catch (Exception e) {
 			LOG.warn("Couldn't create keycloak master admin user: {}", e.getMessage());
-			session.getTransactionManager().rollback();
-		}
-		session.close();
-	}
-
-	private void createRealm() {
-		KeycloakSession session = getSessionFactory().create();
-		try {
-			session.getTransactionManager().begin();
-			RealmManager manager = new RealmManager(session);
-			Resource lessonRealmImportFile = new ClassPathResource(keycloakServerProperties.getRealmImportFile());
-			manager.importRealm(JsonSerialization.readValue(lessonRealmImportFile.getInputStream(), RealmRepresentation.class));
-			session.getTransactionManager().commit();
-		} catch (IOException e) {
-			LOG.warn("Failed to import Realm json file: {}", e.getMessage());
 			session.getTransactionManager().rollback();
 		}
 		session.close();
