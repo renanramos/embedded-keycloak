@@ -13,8 +13,8 @@ import org.keycloak.services.util.JsonConfigProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.renanrramos.embeddedkeycloak.model.AdminUser;
 import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties;
-import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties.AdminUser;
 
 /**
  * @author renan.ramos
