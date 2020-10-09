@@ -25,7 +25,7 @@ public class EmbeddedKeycloakApplication {
 
 	@Bean
 	ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener(ServerProperties serverProperties, KeycloakServerProperties keycloakServerProperties) {
-		return (event) -> {
+		return event -> {
 			Integer port = serverProperties.getPort();
 			String keycloakContextPath = keycloakServerProperties.getContextPath();
 			LOG.info("Embedded Keycloak started: http://localhost:{}{} to use keycloak", port, keycloakContextPath);
