@@ -3,7 +3,10 @@
  */
 package com.renanrramos.embeddedkeycloak.properties;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import com.renanrramos.embeddedkeycloak.model.AdminUser;
 
 /**
  * @author renan.ramos
@@ -12,10 +15,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "keycloak.server")
 public class KeycloakServerProperties {
 
-	String contextPath = "/auth";
-	String realmImportFile = "realm.json";
-	AdminUser adminUser = new AdminUser();
+	@Value("${keycloak.server.context-path}")
+	private String contextPath;
+	
+	@Value("keycloak.server.real-import-file")
+	private String realmImportFile;
 
+	private AdminUser adminUser;
+
+	public KeycloakServerProperties() {
+		this.adminUser = new AdminUser();
+	}
+	
 	public String getContextPath() {
 		return contextPath;
 	}
@@ -38,26 +49,5 @@ public class KeycloakServerProperties {
 
 	public void setAdminUser(AdminUser adminUser) {
 		this.adminUser = adminUser;
-	}
-
-	public static class AdminUser {
-		String username = "admin@mail.com";
-		String password = "admin";
-
-		public String getUsername() {
-			return username;
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setUsername(String username) {
-			this.username = username;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
 	}
 }
