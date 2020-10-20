@@ -21,6 +21,9 @@ public class KeycloakServerProperties {
 	@Value("keycloak.server.real-import-file")
 	private String realmImportFile;
 
+	@Value("keycloak.server.easy-shopping-realm-file")
+	private String easyShoppingRealmFile;
+
 	private AdminUser adminUser;
 
 	public KeycloakServerProperties() {
@@ -49,5 +52,13 @@ public class KeycloakServerProperties {
 
 	public void setAdminUser(AdminUser adminUser) {
 		this.adminUser = adminUser;
+	}
+
+	public String getEasyShoppingRealmFile() {
+		return easyShoppingRealmFile;
+	}
+
+	public void setEasyShoppingRealmFile(String easyShoppingRealmFile) {
+		this.easyShoppingRealmFile = easyShoppingRealmFile;
 	}
 }
