@@ -7,11 +7,18 @@ import java.util.NoSuchElementException;
 
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.services.managers.ApplianceBootstrap;
+import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.resources.KeycloakApplication;
 import org.keycloak.services.util.JsonConfigProviderFactory;
+import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.renanrramos.embeddedkeycloak.model.AdminUser;
 import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties;
@@ -24,6 +31,8 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	private static final Logger LOG = LoggerFactory.getLogger(EmbeddedKeycloakApp.class);
 
 	static KeycloakServerProperties keycloakServerProperties;
+
+	private static final String EASY_SHOPPING_REALM = "easy-shopping-realm.json";
 	
 	@Override
 	protected void loadConfig() {
@@ -34,6 +43,7 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	public EmbeddedKeycloakApp() {
 		super();
 		createMasterRealmAdminUser();
+		createEasyShppingRealm();
 	}
 
 	private void createMasterRealmAdminUser() {
@@ -47,6 +57,23 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 			session.getTransactionManager().commit();			
 		} catch (Exception e) {
 			LOG.warn("Couldn't create keycloak master admin user: {}", e.getMessage());
+			session.getTransactionManager().rollback();
+		}
+		session.close();
+	}
+
+	private void createEasyShppingRealm() {
+		LOG.info("Creating Easy Shopping Realm");
+		KeycloakSession session = getSessionFactory().create();
+		try {
+			session.getTransactionManager().begin();
+			RealmManager manager = new RealmManager(session);
+			Resource realmFile = new ClassPathResource(EASY_SHOPPING_REALM);
+			LOG.info("Path: {}", realmFile.getFilename());
+			manager.importRealm(JsonSerialization.readValue(realmFile.getInputStream(), RealmRepresentation.class));
+			session.getTransactionManager().commit();
+		}catch (Exception e) {
+			LOG.warn("Failed to import Realm json file: {}", e.getMessage());
 			session.getTransactionManager().rollback();
 		}
 		session.close();
