@@ -18,7 +18,7 @@ public class KeycloakServerProperties {
 	@Value("${keycloak.server.context-path}")
 	private String contextPath;
 	
-	@Value("keycloak.server.real-import-file")
+	@Value("keycloak.server.realm-import-file")
 	private String realmImportFile;
 
 	private AdminUser adminUser;
