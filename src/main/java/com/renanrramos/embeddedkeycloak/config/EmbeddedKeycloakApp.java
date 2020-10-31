@@ -3,6 +3,7 @@
  */
 package com.renanrramos.embeddedkeycloak.config;
 
+import java.util.Calendar;
 import java.util.NoSuchElementException;
 
 import org.keycloak.Config;
@@ -23,9 +24,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.renanrramos.embeddedkeycloak.model.AdminUser;
+import com.renanrramos.embeddedkeycloak.model.common.BaseUser;
+import com.renanrramos.embeddedkeycloak.model.common.UserType;
 import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties;
-import com.renanrramos.embeddedkeycloak.properties.base.model.BaseUser;
-import com.renanrramos.embeddedkeycloak.properties.model.Administrator;
 
 /**
  * @author renan.ramos
@@ -37,10 +38,6 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	static KeycloakServerProperties keycloakServerProperties;
 
 	private static final String EASY_SHOPPING_REALM = "easy-shopping-realm.json";
-
-	private static final String ADMINISTRATOR_USER_TYPE = "administrator";
-	private static final String COMPANY_USER_TYPE = "company";
-	private static final String CUSTOMER_USER_TYPE = "customer";
 
 	@Override
 	protected void loadConfig() {
@@ -58,17 +55,20 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	}
 
 	private void createEasyShoppingAdminUser() {
-		BaseUser user = new Administrator().getInstance(ADMINISTRATOR_USER_TYPE);
+		BaseUser user = new BaseUser().getInstance(UserType.ADMINISTRATOR);
+		LOG.info("Admin user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCompanyUser() {
-		BaseUser user = new Administrator().getInstance(COMPANY_USER_TYPE);
+		BaseUser user = new BaseUser().getInstance(UserType.COMPANY);
+		LOG.info("Company user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCustomerUser() {
-		BaseUser user = new Administrator().getInstance(CUSTOMER_USER_TYPE);
+		BaseUser user = new BaseUser().getInstance(UserType.CUSTOMER);
+		LOG.info("Customer user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
 
@@ -82,23 +82,21 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 		RealmModel realm = session.realms().getRealm(easyShoppingRealm);
 		session.getContext().setRealm(realm);
 
-		if (session.users().getUsersCount(realm) > 0) {
-			throw new IllegalStateException("Can't create initial user as users already exists");
-		}
-
-		UserModel easyShoppingUser = session.users().addUser(realm, user.getUsername());
-		easyShoppingUser.setEnabled(true);
-		easyShoppingUser.setEmail(user.getEmail());
-		easyShoppingUser.setFirstName(user.getFirstName());
-		easyShoppingUser.setLastName(user.getLastName());
-		easyShoppingUser.setEmailVerified(true);
-		easyShoppingUser.setUsername(user.getUsername());
+		LOG.info("User: {}", user.getUsername());
+		UserModel userModel = session.users().addUser(realm, user.getUsername());
+		userModel.setEnabled(true);
+		userModel.setEmail(user.getEmail());
+		userModel.setFirstName(user.getFirstName());
+		userModel.setLastName(user.getLastName());
+		userModel.setEmailVerified(true);
+		userModel.setUsername(user.getUsername());
+		userModel.setCreatedTimestamp(Calendar.getInstance().getTimeInMillis());
 
 		UserCredentialModel usrCredModel = UserCredentialModel.password(user.getPassword());
-		session.userCredentialManager().updateCredential(realm, easyShoppingUser, usrCredModel);
+		session.userCredentialManager().updateCredential(realm, userModel, usrCredModel);
 
 		RoleModel adminRole = realm.getRole(user.getRole());
-		easyShoppingUser.grantRole(adminRole);
+		userModel.grantRole(adminRole);
 		session.getTransactionManager().commit();
 		session.close();
 	}
