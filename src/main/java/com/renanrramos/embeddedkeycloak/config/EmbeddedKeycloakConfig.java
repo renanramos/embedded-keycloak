@@ -1,14 +1,14 @@
 /**
- * 
+ *
  */
 package com.renanrramos.embeddedkeycloak.config;
 
 import javax.naming.CompositeName;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.spi.NamingManager;
 import javax.naming.Name;
 import javax.naming.NameParser;
+import javax.naming.NamingException;
+import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
 
 import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
@@ -30,15 +30,13 @@ public class EmbeddedKeycloakConfig {
 
 	@Bean
 	public ServletRegistrationBean<HttpServlet30Dispatcher> keycloakJaxRsApplication(KeycloakServerProperties keycloakServerProperties, DataSource dataSource) throws NamingException {
-		
+
 		mockJndiEnvironment(dataSource);
 		EmbeddedKeycloakApp.keycloakServerProperties = keycloakServerProperties;
 		ServletRegistrationBean<HttpServlet30Dispatcher> servlet = new ServletRegistrationBean<>(new HttpServlet30Dispatcher());
-		servlet.addInitParameter("javax.ws.rs.Application", 
-				EmbeddedKeycloakApp.class.getName());
-		servlet.addInitParameter(ResteasyContextParameters.RESTEASY_SERVLET_MAPPING_PREFIX, 
+		servlet.addInitParameter("javax.ws.rs.Application", EmbeddedKeycloakApp.class.getName());
+		servlet.addInitParameter(ResteasyContextParameters.RESTEASY_SERVLET_MAPPING_PREFIX,
 				keycloakServerProperties.getContextPath());
-
 		servlet.addInitParameter(ResteasyContextParameters.RESTEASY_USE_CONTAINER_FORM_PARAMS, "true");
 		servlet.addUrlMappings(keycloakServerProperties.getContextPath() + "/*");
 		servlet.setLoadOnStartup(1);
@@ -58,7 +56,7 @@ public class EmbeddedKeycloakConfig {
 	private void mockJndiEnvironment(DataSource dataSource) throws NamingException {
 		NamingManager.setInitialContextFactoryBuilder(
 				(env) -> (environment) -> new InitialContext() {
-					
+
 					@Override
 					public Object lookup(Name name) throws NamingException {
 						return lookup(name.toString());
@@ -78,7 +76,7 @@ public class EmbeddedKeycloakConfig {
 					}
 
 					@Override
-					public void close() throws NamingException {	
+					public void close() throws NamingException {
 					}
 				});
 	}

@@ -22,7 +22,7 @@ import com.renanrramos.embeddedkeycloak.properties.KeycloakServerProperties;
 public class EmbeddedKeycloakApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EmbeddedKeycloakApplication.class);
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(EmbeddedKeycloakApplication.class, args);
 	}
@@ -31,7 +31,7 @@ public class EmbeddedKeycloakApplication {
 	public RedirectView index() {
 		return new RedirectView("/auth");
 	}
-	
+
 	@Bean
 	ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener(ServerProperties serverProperties, KeycloakServerProperties keycloakServerProperties) {
 		return event -> {
