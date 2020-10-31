@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.renanrramos.embeddedkeycloak.properties;
 
@@ -17,8 +17,8 @@ public class KeycloakServerProperties {
 
 	@Value("${keycloak.server.context-path}")
 	private String contextPath;
-	
-	@Value("keycloak.server.realm-import-file")
+
+	@Value("${keycloak.server.realm-import-file}")
 	private String realmImportFile;
 
 	private AdminUser adminUser;
@@ -26,7 +26,7 @@ public class KeycloakServerProperties {
 	public KeycloakServerProperties() {
 		this.adminUser = new AdminUser();
 	}
-	
+
 	public String getContextPath() {
 		return contextPath;
 	}
