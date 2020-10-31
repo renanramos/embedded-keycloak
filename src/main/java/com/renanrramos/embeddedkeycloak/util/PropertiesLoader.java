@@ -36,10 +36,7 @@ public class PropertiesLoader {
 		// Intentionally empty
 	}
 
-	public static String getUserProperty(String propName) {
-		if (config == null) {
-			config = loadProperties();
-		}
+	public static String getUserProperty(Properties config, String propName) {
 		return Optional.ofNullable(config.getProperty(propName)).orElse("");
 	}
 }
