@@ -473,7 +473,6 @@
   "groups": [],
   "defaultRoles": [
     "offline_access",
-    "app-customer",
     "uma_authorization"
   ],
   "requiredCredentials": [
