@@ -39,6 +39,8 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 
 	private static final String EASY_SHOPPING_REALM = "easy-shopping-realm.json";
 
+	private BaseUser user;
+
 	@Override
 	protected void loadConfig() {
 		JsonConfigProviderFactory factory = new RegularJsonConfigProviderFactory();
@@ -55,19 +57,19 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	}
 
 	private void createEasyShoppingAdminUser() {
-		BaseUser user = new BaseUser().getInstance(UserType.ADMINISTRATOR);
+		user = new BaseUser().getInstance(UserType.ADMINISTRATOR);
 		LOG.info("Admin user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCompanyUser() {
-		BaseUser user = new BaseUser().getInstance(UserType.COMPANY);
+		user = new BaseUser().getInstance(UserType.COMPANY);
 		LOG.info("Company user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCustomerUser() {
-		BaseUser user = new BaseUser().getInstance(UserType.CUSTOMER);
+		user = new BaseUser().getInstance(UserType.CUSTOMER);
 		LOG.info("Customer user: {}", user.toString());
 		createEasyShoppingUser(user);
 	}
@@ -75,29 +77,33 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 	private void createEasyShoppingUser(BaseUser user) {
 
 		KeycloakSession session = getSessionFactory().create();
+		try {
+			session.getTransactionManager().begin();
+			String easyShoppingRealm = "easy-shopping";
 
-		session.getTransactionManager().begin();
-		String easyShoppingRealm = "easy-shopping";
+			RealmModel realm = session.realms().getRealm(easyShoppingRealm);
+			session.getContext().setRealm(realm);
 
-		RealmModel realm = session.realms().getRealm(easyShoppingRealm);
-		session.getContext().setRealm(realm);
+			LOG.info("User: {}", user.getUsername());
+			UserModel userModel = session.users().addUser(realm, user.getUsername());
+			userModel.setEnabled(true);
+			userModel.setEmail(user.getEmail());
+			userModel.setFirstName(user.getFirstName());
+			userModel.setLastName(user.getLastName());
+			userModel.setEmailVerified(true);
+			userModel.setUsername(user.getUsername());
+			userModel.setCreatedTimestamp(Calendar.getInstance().getTimeInMillis());
 
-		LOG.info("User: {}", user.getUsername());
-		UserModel userModel = session.users().addUser(realm, user.getUsername());
-		userModel.setEnabled(true);
-		userModel.setEmail(user.getEmail());
-		userModel.setFirstName(user.getFirstName());
-		userModel.setLastName(user.getLastName());
-		userModel.setEmailVerified(true);
-		userModel.setUsername(user.getUsername());
-		userModel.setCreatedTimestamp(Calendar.getInstance().getTimeInMillis());
+			UserCredentialModel usrCredModel = UserCredentialModel.password(user.getPassword());
+			session.userCredentialManager().updateCredential(realm, userModel, usrCredModel);
 
-		UserCredentialModel usrCredModel = UserCredentialModel.password(user.getPassword());
-		session.userCredentialManager().updateCredential(realm, userModel, usrCredModel);
-
-		RoleModel adminRole = realm.getRole(user.getRole());
-		userModel.grantRole(adminRole);
-		session.getTransactionManager().commit();
+			RoleModel adminRole = realm.getRole(user.getRole());
+			userModel.grantRole(adminRole);
+			session.getTransactionManager().commit();
+		} catch (Exception e) {
+			LOG.warn("Can't create user: {}", e.getMessage());
+			session.getTransactionManager().rollback();
+		}
 		session.close();
 	}
 
