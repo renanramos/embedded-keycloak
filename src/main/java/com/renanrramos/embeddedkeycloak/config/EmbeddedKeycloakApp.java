@@ -58,19 +58,19 @@ public class EmbeddedKeycloakApp extends KeycloakApplication {
 
 	private void createEasyShoppingAdminUser() {
 		user = new BaseUser().getInstance(UserType.ADMINISTRATOR);
-		LOG.info("Admin user: {}", user.toString());
+		LOG.info("Admin user: {}", user);
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCompanyUser() {
 		user = new BaseUser().getInstance(UserType.COMPANY);
-		LOG.info("Company user: {}", user.toString());
+		LOG.info("Company user: {}", user);
 		createEasyShoppingUser(user);
 	}
 
 	private void createEasyShoppingCustomerUser() {
 		user = new BaseUser().getInstance(UserType.CUSTOMER);
-		LOG.info("Customer user: {}", user.toString());
+		LOG.info("Customer user: {}", user);
 		createEasyShoppingUser(user);
 	}
 
