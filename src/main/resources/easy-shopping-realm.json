@@ -784,7 +784,8 @@
         "CUSTOMER"
       ],
       "redirectUris": [
-        "http://localhost:4200/*"
+        "http://localhost:4200/*",
+        "http://app-easy-shopping.herokuapp.com/*"
       ],
       "webOrigins": [
         "*"
@@ -1094,6 +1095,7 @@
       "protocol": "openid-connect",
       "attributes": {
         "include.in.token.scope": "true",
+        "login_theme": "keycloak",
         "display.on.consent.screen": "true"
       }
     },
